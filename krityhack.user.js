@@ -1,20 +1,21 @@
 // ==UserScript==
-// @name         Survev-KrityHack
-// @namespace    https://github.com/Drino955/survev-krityhack
+// @name         Hack
+// @namespace    https://github.com/Nguyenem21/survev
 // @version      0.2.1
 // @description  Aimbot, xray, tracer, better zoom, smoke/obstacle opacity, autoloot, player names...
 // @author       KrityTeam
 // @match        *://survev.io/*
 // @match        *://resurviv.biz/*
+// @match        *://zurviv.io/*
 // @icon         https://www.google.com/s2/favicons?domain=survev.io
 // @grant        none
 // @run-at       document-start
 // @webRequest   [{"selector":"*app-*.js","action":"cancel"}]
 // @webRequest   [{"selector":"*shared-*.js","action":"cancel"}]
-// @homepageURL  https://github.com/Drino955/survev-krityhack
-// @updateURL    https://raw.githubusercontent.com/Drino955/survev-krityhack/main/krityhack.user.js
-// @downloadURL  https://raw.githubusercontent.com/Drino955/survev-krityhack/main/krityhack.user.js
-// @supportURL   https://github.com/Drino955/survev-krityhack/issues
+// @homepageURL  https://github.com/Nguyenem21/survev
+// @updateURL    https://raw.githubusercontent.com/github.com/Nguyenem21/survev/main/krityhack.user.js
+// @downloadURL  https://raw.githubusercontent.com/github.com/Nguyenem21/survev/krityhack.user.js
+// @supportURL   https://github.com/Nguyenem21/survev/issues
 // ==/UserScript==
 
 
@@ -43,14 +44,14 @@ const pixiScript = document.createElement('script');
 pixiScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.0.3/pixi.min.js';
 pixiScript.onload = () => console.log('pixi.js loaded');
 pixiScript.onerror = (err) => console.error('Error in pixi.js loading:', err);
-let aimBotEnabled = true;
-let zoomEnabled = true;
-let meleeAttackEnabled = true;
+let aimBotEnabled = false;
+let zoomEnabled = false;
+let meleeAttackEnabled = false;
 let spinBot = false;
 let autoSwitchEnabled = true;
 
-let espEnabled = true;
-let xrayEnabled = true;
+let espEnabled = false;
+let xrayEnabled = false;
 let focusedEnemy = null;
 
 const version = GM_info.script.version;
@@ -61,7 +62,7 @@ overlay.className = 'krity-overlay';
 
 const krityTitle = document.createElement('h3');
 krityTitle.className = 'krity-title';
-krityTitle.innerText = `KrityHack ${version}`;
+krityTitle.innerText = `Crack By NPN `;
 
 const styles = document.createElement('style');
 styles.innerHTML = `
@@ -106,9 +107,9 @@ styles.innerHTML = `
     display: none;
 }
 
-#news-current ul{
-    margin-left: 20px;
-    padding-left: 6px;
+#news-current ul
+    margin-left:10px;
+    padding-left: 2px;
 }
 `;
 
@@ -120,7 +121,6 @@ const aimbotDot = document.createElement('div')
 aimbotDot.className = 'aimbotDot';
 
 keybinds();
-removeCeilings();
 autoLoot();
 bootLoader(); // init game every time()
 
@@ -128,26 +128,26 @@ function keybinds(){
     window.addEventListener('keyup', function (event) {
         if (!window?.game?.ws) return;
 
-        const validKeys = ['B', 'Z', 'M', 'Y', 'T'];
+        const validKeys = ['1', '2', '3', '4', '5'];
         if (!validKeys.includes(String.fromCharCode(event.keyCode))) return;
-    
+
         switch (String.fromCharCode(event.keyCode)) {
-            case 'B': 
-                aimBotEnabled = !aimBotEnabled; 
+            case '1':
+                aimBotEnabled = !aimBotEnabled;
                 aimbotDot.style.display = 'None';
                 window.lastAimPos = null;
                 window.aimTouchMoveDir = null;
                 break;
-            case 'Z': zoomEnabled = !zoomEnabled; break;
-            case 'M': 
+            case '2': zoomEnabled = !zoomEnabled; break;
+            case '3':
                 meleeAttackEnabled = !meleeAttackEnabled;
                 window.aimTouchMoveDir = null;
                 event.stopImmediatePropagation()
                 event.stopPropagation();
                 event.preventDefault();
                 break;
-            case 'Y': spinBot = !spinBot; break;
-            case 'T': 
+            case '4': spinBot = !spinBot; break;
+            case '5':
                 if(focusedEnemy){
                     focusedEnemy = null;
                 }else{
@@ -161,20 +161,20 @@ function keybinds(){
         }
         updateOverlay();
     });
-    
+
     window.addEventListener('keydown', function (event) {
         if (!window?.game?.ws) return;
 
-        const validKeys = ['M', 'T'];
+        const validKeys = ['6', '7'];
         if (!validKeys.includes(String.fromCharCode(event.keyCode))) return;
-    
+
         switch (String.fromCharCode(event.keyCode)) {
-            case 'M': 
+            case '6':
                 event.stopImmediatePropagation()
                 event.stopPropagation();
                 event.preventDefault();
                 break;
-            case 'T': 
+            case '7':
                 event.stopImmediatePropagation()
                 event.stopPropagation();
                 event.preventDefault();
@@ -197,7 +197,7 @@ function keybinds(){
 
         players.forEach((player) => {
             // We miss inactive or dead players
-            if (!player.active || player.netData.dead || player.downed || me.__id === player.__id || getTeam(player) == meTeam) return;
+  
 
             const screenPlayerPos = window.game.camera.pointToScreen({x: player.pos._x, y: player.pos._y});
             const distanceToEnemyFromMouse = (screenPlayerPos.x - mouseX) ** 2 + (screenPlayerPos.y - mouseY) ** 2;
@@ -225,10 +225,10 @@ function removeCeilings(){
     Object.defineProperty( Object.prototype, 'textureCacheIds', {
         set( value ) {
             this._textureCacheIds = value;
-    
+
             if ( Array.isArray( value ) ) {
                 const scope = this;
-    
+
                 value.push = new Proxy( value.push, {
                     apply( target, thisArgs, args ) {
                         // console.log(args[0], scope, scope?.baseTexture?.cacheId);
@@ -239,17 +239,17 @@ function removeCeilings(){
                                     this._valid = value;
                                 },
                                 get() {
-                                    return xrayEnabled ? false : this._valid;
+                                    return xrayEnabled? false : this._valid;
                                 }
                             });
                         }
                         return Reflect.apply( ...arguments );
-    
+
                     }
                 });
-    
+
             }
-    
+
         },
         get() {
             return this._textureCacheIds;
@@ -264,9 +264,9 @@ function autoLoot(){
         },
         set(value) {
             this._basicDataInfo = value;
-            
+
             if (!value) return;
-            
+
             Object.defineProperty(window.basicDataInfo, 'isMobile', {
                 get () {
                     return true;
@@ -274,7 +274,7 @@ function autoLoot(){
                 set(value) {
                 }
             });
-            
+
             Object.defineProperty(window.basicDataInfo, 'useTouch', {
                 get () {
                     return true;
@@ -282,7 +282,7 @@ function autoLoot(){
                 set(value) {
                 }
             });
-            
+
         }
     });
 }
@@ -294,11 +294,11 @@ function bootLoader(){
         },
         set(value) {
             this._game = value;
-            
+
             if (!value) return;
-            
+
             initGame();
-            
+
         }
     });
 }
@@ -345,7 +345,7 @@ function initGame() {
     enemyAimBot = null;
     focusedEnemy = null;
     friends = [];
-    lastFrames = {}; 
+    lastFrames = {};
 
     const tasks = [
         {isApplied: false, condition: () => window.game?.input?.mouseButtonsOld, action: bumpFire},
@@ -362,20 +362,20 @@ function initGame() {
         console.log('Checking local data')
 
         console.log(
-            window.game?.activePlayer?.localData, 
+            window.game?.activePlayer?.localData,
             window.game?.map?.obstaclePool?.pool,
             window.game?.smokeBarn?.particles,
             window.game?.playerBarn?.playerPool?.pool
         );
 
         tasks.forEach(task => console.log(task.action, task.isApplied))
-        
+
         tasks.forEach(task => {
             if (task.isApplied || !task.condition()) return;
             task.action();
             task.isApplied = true;
         });
-        
+
         if (tasks.some(task => !task.isApplied)) setTimeout(checkLocalData, 5);
         else console.log('All functions applied, stopping loop.');
     })();
@@ -439,7 +439,7 @@ function betterZoom(){
 
 function smokeOpacity(){
     console.log('smokeopacity')
-    
+
     const particles = window.game.smokeBarn.particles;
     console.log('smokeopacity', particles, window.game.smokeBarn.particles)
     particles.push = new Proxy( particles.push, {
@@ -511,30 +511,15 @@ function visibleNames(){
             return Reflect.apply( ...arguments );
         }
     });
-
-    pool.forEach(player => {
-        Object.defineProperty(player.nameText, 'visible', {
-            get(){
-                const me = window.game.activePlayer;
-                const meTeam = getTeam(me);
-                const playerTeam = getTeam(player);
-                // console.log('visible', player?.nameText?._text, playerTeam === meTeam ? BLUE : RED, player, me, playerTeam, meTeam)
-                this.tint = playerTeam === meTeam ? BLUE : RED;
-                player.nameText.style.fontSize = 40;
-                return true;
-            },
-            set(value){
-            }
-        });
-    });
+ 
 }
 
-let laserDrawerEnabled = true,
-    lineDrawerEnabled = true,
+let laserDrawerEnabled = false,
+    lineDrawerEnabled = false,
     nadeDrawerEnabled = true;
 let friends = [];
 function esp(){
-    const pixi = window.game.pixi; 
+    const pixi = window.game.pixi;
     const me = window.game.activePlayer;
     const players = window.game.playerBarn.playerPool.pool;
 
@@ -548,7 +533,7 @@ function esp(){
     const meY = me.pos.y;
 
     const meTeam = getTeam(me);
-    
+
     try{
 
     // lineDrawer
@@ -557,23 +542,23 @@ function esp(){
             me.container.lineDrawer = new PIXI.Graphics();
             me.container.addChild(me.container.lineDrawer);
         }
-            
+
         const lineDrawer = me.container.lineDrawer;
         lineDrawer.clear(); // Cleaning previous lines
-    
+
         // For each player
         players.forEach((player) => {
             // We miss inactive or dead players
             if (!player.active || player.netData.dead || me.__id == player.__id) return;
-    
+
             const playerX = player.pos.x;
             const playerY = player.pos.y;
-    
+
             const playerTeam = getTeam(player);
-    
+
             // We calculate the color of the line (for example, red for enemies)
             const lineColor = playerTeam === meTeam ? BLUE : friends.includes(player.nameText._text) ? GREEN : me.layer === player.layer && !player.downed ? RED : WHITE;
-    
+
             // We draw a line from the current player to another player
             lineDrawer.lineStyle(2, lineColor, 1);
             lineDrawer.moveTo(0, 0); // Container Container Center
@@ -590,10 +575,10 @@ function esp(){
             me.container.nadeDrawer = new PIXI.Graphics();
             me.container.addChild(me.container.nadeDrawer);
         }
-            
+
         const nadeDrawer = me.container.nadeDrawer;
         nadeDrawer.clear();
-    
+
         Object.values(window.game.objectCreator.idToObj)
             .filter(obj => {
                 const isValid = ( obj.__type === 9 && obj.type !== "smoke" )
@@ -626,15 +611,15 @@ function esp(){
     if (laserDrawerEnabled) {
         const curWeapon = findWeap(me);
         const curBullet = findBullet(curWeapon);
-        
+
         if ( !me.container.laserDrawer ) {
             me.container.laserDrawer = new PIXI.Graphics();
             me.container.addChildAt(me.container.laserDrawer, 0);
         }
         const laserDrawer = me.container.laserDrawer;
         laserDrawer.clear();
-            
-    
+
+
         function laserPointer(
             curBullet,
             curWeapon,
@@ -643,29 +628,29 @@ function esp(){
             opacity = 0.3,
         ) {
             const { pos: acPlayerPos, posOld: acPlayerPosOld } = acPlayer;
-    
+
             const dateNow = performance.now();
-    
+
             if ( !(acPlayer.__id in lastFrames) ) lastFrames[acPlayer.__id] = [];
             lastFrames[acPlayer.__id].push([dateNow, { ...acPlayerPos }]);
-    
+
             if (lastFrames[acPlayer.__id].length < 10) return;
-    
+
             if (lastFrames[acPlayer.__id].length > 10){
                 lastFrames[acPlayer.__id].shift();
             }
-    
+
             const deltaTime = (dateNow - lastFrames[acPlayer.__id][0][0]) / 1000; // Time since last frame in seconds
-    
+
             const acPlayerVelocity = {
                 x: (acPlayerPos._x - lastFrames[acPlayer.__id][0][1]._x) / deltaTime,
                 y: (acPlayerPos._y - lastFrames[acPlayer.__id][0][1]._y) / deltaTime,
             };
-    
+
             let lasic = {};
-        
+
             let isMoving = !!(acPlayerVelocity.x || acPlayerVelocity.y);
-        
+
             if(curBullet) {
                 lasic.active = true;
                 lasic.range = curBullet.distance * 16.25;
@@ -680,7 +665,7 @@ function esp(){
                     atan = Math.atan2(
                         acPlayer.dir.x,
                         acPlayer.dir.y
-                    ) 
+                    )
                     -
                     Math.PI / 2;
                 }
@@ -693,11 +678,11 @@ function esp(){
             } else {
                 lasic.active = false;
             }
-        
+
             if(!lasic.active) {
                 return;
             }
-    
+
             const center = {
                 x: (acPlayerPos._x - me.pos._x) * 16,
                 y: (me.pos._y - acPlayerPos._y) * 16,
@@ -723,14 +708,14 @@ function esp(){
             laserDrawer.lineTo(center.x, center.y);
             laserDrawer.endFill();
         }
-        
-        
+
+
         laserPointer(
             curBullet,
             curWeapon,
             me,
         );
-        
+
         players
             .filter(player => player.active || !player.netData.dead || me.__id !== player.__id || me.layer === player.layer || getTeam(player) != meTeam)
             .forEach(enemy => {
@@ -831,7 +816,7 @@ function aimBot() {
 
         let enemy = null;
         let minDistanceToEnemyFromMouse = Infinity;
-        
+
         if (focusedEnemy && focusedEnemy.active && !focusedEnemy.netData.dead) {
             enemy = focusedEnemy;
         }else{
@@ -843,11 +828,11 @@ function aimBot() {
             players.forEach((player) => {
                 // We miss inactive or dead players
                 if (!player.active || player.netData.dead || player.downed || me.__id === player.__id || me.layer !== player.layer || getTeam(player) == meTeam || friends.includes(player.nameText._text)) return;
-    
+
                 const screenPlayerPos = window.game.camera.pointToScreen({x: player.pos._x, y: player.pos._y});
                 // const distanceToEnemyFromMouse = Math.hypot(screenPlayerPos.x - window.game.input.mousePos._x, screenPlayerPos.y - window.game.input.mousePos._y);
                 const distanceToEnemyFromMouse = (screenPlayerPos.x - window.game.input.mousePos._x) ** 2 + (screenPlayerPos.y - window.game.input.mousePos._y) ** 2;
-                
+
                 if (distanceToEnemyFromMouse < minDistanceToEnemyFromMouse) {
                     minDistanceToEnemyFromMouse = distanceToEnemyFromMouse;
                     enemy = player;
@@ -877,7 +862,7 @@ function aimBot() {
                 clientX: predictedEnemyPos.x,
                 clientY: predictedEnemyPos.y,
             }
-            
+
             // AutoMelee
             if(meleeAttackEnabled && distanceToEnemy <= 8) {
                 const moveAngle = calcAngle(enemy.pos, me.pos) + Math.PI;
@@ -922,7 +907,7 @@ function calculatePredictedPosForShoot(enemy, curPlayer) {
         console.log("Missing enemy or player data");
         return null;
     }
-    
+
     const { pos: enemyPos } = enemy;
     const { pos: curPlayerPos } = curPlayer;
 
@@ -969,7 +954,7 @@ function calculatePredictedPosForShoot(enemy, curPlayer) {
     const b = -2 * (vex * dx + vey * dy);
     const c = -(dx ** 2) - (dy ** 2);
 
-    let t; 
+    let t;
 
     if (Math.abs(a) < 1e-6) {
         console.log('Linear solution bullet speed is much greater than velocity')
@@ -1019,11 +1004,11 @@ function updateOverlay() {
     overlay.innerHTML = ``;
 
     const controls = [
-        [ '[B] AimBot:', aimBotEnabled, aimBotEnabled ? 'ON' : 'OFF' ],
-        [ '[Z] Zoom:', zoomEnabled, zoomEnabled ? 'ON' : 'OFF' ],
-        [ '[M] MeleeAtk:', meleeAttackEnabled, meleeAttackEnabled ? 'ON' : 'OFF' ],
-        [ '[Y] SpinBot:', spinBot, spinBot ? 'ON' : 'OFF' ],
-        [ '[T] FocusedEnemy:', focusedEnemy, focusedEnemy?.nameText?._text ? focusedEnemy?.nameText?._text : 'OFF' ],
+        [ '', aimBotEnabled, aimBotEnabled ? '' : '' ],
+        [ '', zoomEnabled, zoomEnabled ? '' : '' ],
+        [ '', meleeAttackEnabled, meleeAttackEnabled ? '' : '' ],
+        [ '', spinBot, spinBot ? '' : '' ],
+        [ '', focusedEnemy, focusedEnemy?.nameText?._text ? focusedEnemy?.nameText?._text : '' ],
         // [ '[O] gameOptimization:', gameOptimization ],
     ];
 
@@ -1072,8 +1057,8 @@ function autoSwitch(){
         try {
             s =
                 (window.guns[gun].fireMode === "single"
-                || window.guns[gun].fireMode === "burst") 
-                && window.guns[gun].fireDelay >= 0.45;
+                || window.guns[gun].fireMode === "burst")
+                && window.guns[gun].fireDelay >= 0.15;
         }
         catch (e) {
         }
@@ -1148,7 +1133,7 @@ function grenadeTimer(){
     const player = window.game.activePlayer;
     const activeItem = player.netData.activeWeapon;
 
-    if (3 !== window.game.activePlayer.localData.curWeapIdx 
+    if (3 !== window.game.activePlayer.localData.curWeapIdx
         || player.throwableState !== "cook"
         || (!activeItem.includes('frag') && !activeItem.includes('mirv') && !activeItem.includes('martyr_nade'))
     )
@@ -1255,7 +1240,7 @@ window.GameMod = class GameMod { // metka mod
       this.isFpsVisible = !this.isFpsVisible;
       this.updateFpsVisibility();
     }
-    
+
     setAnimationFrameCallback() {
         this.animationFrameCallback = (callback) => setTimeout(callback, 1);
     }
@@ -1477,7 +1462,7 @@ window.GameMod = class GameMod { // metka mod
             container.style.border = "3px solid #FFFFFF";
           }
         });
-  
+
         const weaponNames = Array.from(
           document.getElementsByClassName("ui-weapon-name"),
         );
@@ -1486,33 +1471,33 @@ window.GameMod = class GameMod { // metka mod
           const observer = new MutationObserver(() => {
             const weaponName = weaponNameElement.textContent.trim();
             let border = "#FFFFFF";
-  
-            switch (weaponName.toUpperCase()) { 
+
+            switch (weaponName.toUpperCase()) {
               //yellow
               case "CZ-3A1": case "G18C": case "M9": case "M93R": case "MAC-10": case "MP5": case "P30L": case "DUAL P30L": case "UMP9": case "VECTOR": case "VSS": case "FLAMETHROWER": border = "#FFAE00"; break;
-              //blue 
+              //blue
               case "AK-47": case "OT-38": case "OTS-38": case "M39 EMR": case "DP-28": case "MOSIN-NAGANT": case "SCAR-H": case "SV-98": case "M1 GARAND": case "PKP PECHENEG": case "AN-94": case "BAR M1918": case "BLR 81": case "SVD-63": case "M134": case "GROZA": case "GROZA-S": border = "#007FFF"; break;
               //green
               case "FAMAS": case "M416": case "M249": case "QBB-97": case "MK 12 SPR": case "M4A1-S": case "SCOUT ELITE": case "L86A2": border = "#0f690d"; break;
-              //red 
+              //red
               case "M870": case "MP220": case "SAIGA-12": case "SPAS-12": case "USAS-12": case "SUPER 90": case "LASR GUN": case "M1100": border = "#FF0000"; break;
               //purple
               case "MODEL 94": case "PEACEMAKER": case "VECTOR (.45 ACP)": case "M1911": case "M1A1": border = "#800080"; break;
               //black
               case "DEAGLE 50": case "RAINBOW BLASTER": border = "#000000"; break;
               //olive
-              case "AWM-S": case "MK 20 SSR": border = "#808000"; break; 
+              case "AWM-S": case "MK 20 SSR": border = "#808000"; break;
               //brown
               case "POTATO CANNON": case "SPUD GUN": border = "#A52A2A"; break;
               //other Guns
-              case "FLARE GUN": border = "#FF4500"; break; case "M79": border = "#008080"; break; case "HEART CANNON": border = "#FFC0CB"; break; 
+              case "FLARE GUN": border = "#FF4500"; break; case "M79": border = "#008080"; break; case "HEART CANNON": border = "#FFC0CB"; break;
               default: border = "#FFFFFF"; break; }
-  
+
             if (weaponContainer.id !== "ui-weapon-id-4") {
               weaponContainer.style.border = `3px solid ${border}`;
             }
           });
-  
+
           observer.observe(weaponNameElement, {
             childList: true,
             characterData: true,
@@ -1608,17 +1593,17 @@ window.GameMod = class GameMod { // metka mod
           fontSize: "18px",
           color: "#fff",
           maxWidth: "300px",
-          height: "100%",
+          height: "50%",
         //   maxHeight: "320px",
           overflowY: "auto",
-        //   marginTop: "20px",
+        //   marginTop: "10px",
           marginRight: "30px",
           boxSizing: "border-box",
         });
 
-      
+
         const title = document.createElement("h2");
-        title.textContent = "Social networks";
+        title.textContent = "Nguyễn Phúc Nguyên";
         title.className = 'news-header';
         Object.assign(title.style, {
           margin: "0 0 10px",
@@ -1629,9 +1614,9 @@ window.GameMod = class GameMod { // metka mod
         const description = document.createElement("p");
         description.className = "news-paragraph";
         description.style.fontSize = "14px";
-        description.innerHTML = `⭐ Star us on GitHub<br>📢 Join our Telegram group<br>🎮 Join our Discord server`
+        description.innerHTML = `✅DVFB Ib Admin`
         menu.append(description);
-      
+
         const createSocialLink = (text) => {
           const a = document.createElement("a");
           a.textContent = `${text}`;
@@ -1640,9 +1625,9 @@ window.GameMod = class GameMod { // metka mod
             display: "block",
             border: "none",
             color: "#fff",
-            padding: "10px",
+            padding: "5px",
             borderRadius: "5px",
-            marginBottom: "10px",
+            marginBottom: "5px",
             fontSize: "15px",
             lineHeight: "14px",
             cursor: "pointer",
@@ -1651,29 +1636,21 @@ window.GameMod = class GameMod { // metka mod
           });
           return a;
         };
-      
-        const githubLink = createSocialLink("");
-        githubLink.style.backgroundColor = "#0c1117";
-        githubLink.href = "https://github.com/Drino955/survev-krityhack";
-        githubLink.innerHTML = `<i class="fa-brands fa-github"></i> KrityHack`;
-        menu.append(githubLink);
-        
-        const telegramLink = createSocialLink("");
-        telegramLink.style.backgroundColor = "#00a8e6";
-        telegramLink.href = "https://t.me/krityteam";
-        telegramLink.innerHTML = `<i class="fa-brands fa-telegram-plane"></i> KrityTeam`;
-        menu.append(telegramLink);
+
+
+
+
 
         const discordLink = createSocialLink("");
         discordLink.style.backgroundColor = "#5865F2";
-        discordLink.href = "https://discord.gg/wPuvEySg3E";
-        discordLink.innerHTML = `<i class="fa-brands fa-discord"></i> [HACK] League of Hackers`;
+        discordLink.href = "https://www.facebook.com/lousie.kamui";
+        discordLink.innerHTML = `<i class="fa-brands fa-facebook-f"></i> Nguyễn Phúc Nguyên`;
         menu.append(discordLink);
 
         const additionalDescription = document.createElement("p");
         additionalDescription.className = "news-paragraph";
         additionalDescription.style.fontSize = "14px";
-        additionalDescription.innerHTML = `Your support helps us develop the project and provide better updates!`
+        additionalDescription.innerHTML = `Trùm NPN Hacker Số 1 VN!`
         menu.append(additionalDescription);
 
         const leftColumn = document.querySelector('#left-column');
@@ -1681,57 +1658,26 @@ window.GameMod = class GameMod { // metka mod
         leftColumn.style.marginTop = "10px";
         leftColumn.style.marginBottom = "27px";
         leftColumn.append(menu);
-      
+
         this.menu = menu;
     }
 
     initRules() {
         const newsBlock = document.querySelector("#news-block");
         newsBlock.innerHTML = `
-<h3 class="news-header">KrityHack v0.2.1</h3>
+<h3 class="news-header">TrickerVN</h3><br>
 <div id="news-current">
-<small class="news-date">January 13, 2025</small>
-                      
-<h2>How to use the cheat in the game 🚀</h2>
-<p class="news-paragraph">After installing the cheat, you can use the following features and hotkeys:</p>
+<img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGo0ZmFtZDJ3MmVocHZ3azcxbG9zMXAxZ2gwMWtocm0wOG56M2FwNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8Lc5xmvzRhlLy/giphy.gif" width="250" height="150">
+<p>Itami o kanjiro (痛みを感じろ) : cảm nhận nỗi đau<br>
+Itami o kangaero (痛みを考えろ): thấu hiểu nỗi đau<br>
+Itami o uketore (痛みを受け取れ): chấp nhận nỗi đau<br>
+Itami o shire (痛みを知れ): biết đến nỗi đau<br>
+Itami o shiranu mono ni hontō no heiwa wakaran: (痛みを知らぬものに本当の平和分からん): những kẻ chưa từng trải qua nỗi đau không xứng có được hoà bình thật sự.<br>
+Koko yori. sekai ni itami o. shinra tensei! (ここより・・世界に痛みを・・神羅天征！): giờ đây...thế gian sẽ được nếm trải mùi vị của đau thương.....THẦN LA THIÊN CHINH..!!<p><br>
+<p class="news-paragraph">☠️NPN là bố của game<p></a></p></div>`;
 
-<h3>Hotkeys:</h3>
-<ul>
-    <li><strong>[B]</strong> - Toggle AimBot</li>
-    <li><strong>[Z]</strong> - Toggle Zoom</li>
-    <li><strong>[M]</strong> - Toggle Melee Attack</li>
-    <li><strong>[Y]</strong> - Toggle SpinBot</li>
-    <li><strong>[T]</strong> - Focus on enemy</li>
-</ul>
 
-<h3>Features:</h3>
-<ul>
-    <li>By clicking the middle mouse button, you can add a player to friends. AimBot will not target them, green lines will go to them, and their name will turn green.</li>
-    <li><strong>AutoMelee:</strong> If the enemy is close enough (4 game coordinates), AutoMelee will automatically move towards and attack them when holding down the left mouse button. If you equip a melee weapon, AutoMelee will work at a distance of 8 game coordinates.</li>
-    <li><strong>AutoSwitch:</strong> Quickly switch weapons to avoid cooldown after shooting.</li>
-    <li><strong>BumpFire:</strong> Shoot without constant clicking.</li>
-    <li>Some ESP features can be disabled by changing their values in the code:
-        <pre>let laserDrawerEnabled = true;
-let lineDrawerEnabled = true;
-let nadeDrawerEnabled = true;
-        </pre>
-        Set them to <code>false</code> to disable.
-    </li>
-    <li>AimBot activates when holding down the left mouse button.</li>
-    <li><strong>FocusedEnemy:</strong> Press <strong>[T]</strong> to focus on an enemy. AimBot will continuously target the focused enemy. Press <strong>[T]</strong> again to reset.</li>
-</ul>
-
-<h3>Recommendations:</h3>
-<ul>
-    <li>Play smart and don't rush headlong, as the cheat does not provide immortality.</li>
-    <li>Use adrenaline to the max to heal and run fast.</li>
-    <li>The map is color-coded: white circle - Mosin, gold container - SV98, etc.</li>
-</ul>
-
-<p class="news-paragraph">For more details, visit the <a href="https://github.com/Drino955/survev-krityhack">GitHub page</a> and join our <a href="https://t.me/krityteam">Telegram group</a> or <a href="https://discord.gg/wPuvEySg3E">Discord</a>.</p></div>`;
-    
-    
-    }
+ }
 
     toggleMenuVisibility() {
       const isVisible = this.menu.style.display !== "none";
@@ -1772,7 +1718,7 @@ let nadeDrawerEnabled = true;
       this.updateBoostBars();
       this.updateHealthBars();
     }
-    
+
   }
 
 window.PingTest = class PingTest {
